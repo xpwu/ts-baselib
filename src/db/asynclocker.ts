@@ -3,7 +3,7 @@
 export class AsyncLocker {
   private lockers = new Map<string, (()=>void)[]>()
 
-  async lock(name: string): Promise<void> {
+  async lock(name: string = "__default"): Promise<void> {
     return new Promise((resolve)=>{
       let ls = this.lockers.get(name)
       if (ls !== undefined) {
@@ -17,7 +17,7 @@ export class AsyncLocker {
     })
   }
 
-  unlock(name: string) {
+  unlock(name: string = "__default") {
     let ls = this.lockers.get(name)
     if (ls === undefined) {
       console.warn("unlock the name which be not locked")

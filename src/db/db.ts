@@ -2,11 +2,11 @@ import {BlStorage} from "./storage"
 
 
 export class DB {
-  public async get(key:string):Promise<object|undefined> {
-    return (await this.storage_.get(this.getFullKey(key)));
+  public async get<T>(key:string, con:{new (...args:any[]):T}):Promise<T|undefined> {
+    return (await this.storage_.get(this.getFullKey(key), con));
   }
 
-  public async set(key:string, value:object):Promise<void> {
+  public async set<T>(key:string, value:T): Promise<void> {
     return (await this.storage_.set(this.getFullKey(key), value));
   }
 

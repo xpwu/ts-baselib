@@ -1,33 +1,33 @@
 
 
 export interface BlStorage {
-  set(key:string, value:object): Promise<void>;
-  get(key:string): Promise<object|undefined>;
+  set<T>(key:string, value:T): Promise<void>;
+  get<T>(key:string, con:{new (...args:any[]):T}):Promise<T|undefined>;
   remove(key:string): Promise<void>;
 }
 
-export class MemoryStorage implements BlStorage{
-  private storage = new Map<string, object>()
-
-  async get(key: string): Promise<object | undefined> {
-    return this.storage.get(key);
-  }
-
-  async remove(key: string): Promise<void> {
-    this.storage.delete(key);
-  }
-
-  async set(key: string, value: object): Promise<void> {
-    this.storage.set(key, value);
-  }
-
-}
+// export class MemoryStorage implements BlStorage{
+//   private storage = new Map<string, object>()
+//
+//   async get(key: string): Promise<object | undefined> {
+//     return this.storage.get(key);
+//   }
+//
+//   async remove(key: string): Promise<void> {
+//     this.storage.delete(key);
+//   }
+//
+//   async set(key: string, value: object): Promise<void> {
+//     this.storage.set(key, value);
+//   }
+//
+// }
 
 class dummyStorage implements BlStorage {
   constructor(public log: string) {
   }
 
-  get(key:string):Promise<object|undefined> {
+  get<T>(key:string, con:{new (...args:any[]):T}):Promise<T|undefined> {
     throw Error(`must set ${this.log}, please use 'setXXXStorage'`);
   }
 
@@ -35,7 +35,7 @@ class dummyStorage implements BlStorage {
     throw Error(`must set ${this.log}, please use 'setXXXStorage'`);
   }
 
-  set(key:string, value:object):Promise<void> {
+  set<T>(key:string, value:T): Promise<void> {
     throw Error(`must set ${this.log}, please use 'setXXXStorage'`);
   }
 }
