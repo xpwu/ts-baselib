@@ -1,8 +1,9 @@
+import { ProNullable } from "ts-json";
 
 
 export interface BlStorage {
   set<T>(key:string, value:T): Promise<void>;
-  get<T>(key:string, con:{new (...args:any[]):T}):Promise<T|undefined>;
+  get<T>(key:string, con:{new (...args:any[]):T}):Promise<ProNullable<T>|undefined>;
   has(key:string):boolean
   remove(key:string): Promise<void>;
 }
@@ -32,7 +33,7 @@ class dummyStorage implements BlStorage {
     throw Error(`must set ${this.log}, please use 'setXXXStorage'`);
   }
 
-  get<T>(key:string, con:{new (...args:any[]):T}):Promise<T|undefined> {
+  get<T>(key:string, con:{new (...args:any[]):T}):Promise<ProNullable<T>|undefined> {
     throw Error(`must set ${this.log}, please use 'setXXXStorage'`);
   }
 
@@ -50,11 +51,11 @@ let localSto: BlStorage = new dummyStorage("local storage")
 
 let sessionSto: BlStorage = new dummyStorage("session storage")
 
-export function localStorage(): BlStorage {
+export function localBlStorage(): BlStorage {
   return localSto
 }
 
-export function sessionStorage(): BlStorage {
+export function sessionBlStorage(): BlStorage {
   return sessionSto
 }
 
