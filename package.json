@@ -6,7 +6,8 @@
   "main": "src/index.ts",
   "types": "src/index.ts",
   "dependencies": {
-    "ts-nc": "https://github.com/xpwu/ts-nc.git"
+    "ts-nc": "https://github.com/xpwu/ts-nc.git",
+    "ts-json": "https://github.com/xpwu/ts-json.git"
   },
   "devDependencies": {
     "@types/jest": "28.1.3",
