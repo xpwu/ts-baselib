@@ -91,6 +91,7 @@ export class Table<T extends Item> {
     if (old === undefined) {
       return undefined
     }
+    old.d.id = id
     return old.d
   }
 
@@ -105,7 +106,14 @@ export class Table<T extends Item> {
       ret = ret.concat(old.ids)
     }
 
-    return Array.from(new Set(ret))
+    let s = new Set<string>()
+    for (let id of ret) {
+      if (await this.db.has(this.getName(Table.idKey(id)))) {
+        s.add(id)
+      }
+    }
+
+    return Array.from(new Set(s))
   }
 
   // todo: batch insert

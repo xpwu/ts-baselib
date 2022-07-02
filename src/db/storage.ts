@@ -3,6 +3,7 @@
 export interface BlStorage {
   set<T>(key:string, value:T): Promise<void>;
   get<T>(key:string, con:{new (...args:any[]):T}):Promise<T|undefined>;
+  has(key:string):boolean
   remove(key:string): Promise<void>;
 }
 
@@ -25,6 +26,10 @@ export interface BlStorage {
 
 class dummyStorage implements BlStorage {
   constructor(public log: string) {
+  }
+
+  has(key:string):boolean {
+    throw Error(`must set ${this.log}, please use 'setXXXStorage'`);
   }
 
   get<T>(key:string, con:{new (...args:any[]):T}):Promise<T|undefined> {

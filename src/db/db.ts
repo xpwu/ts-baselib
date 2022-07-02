@@ -3,15 +3,19 @@ import {BlStorage} from "./storage"
 
 export class DB {
   public async get<T>(key:string, con:{new (...args:any[]):T}):Promise<T|undefined> {
-    return (await this.storage_.get(this.getFullKey(key), con));
+    return this.storage_.get(this.getFullKey(key), con)
   }
 
   public async set<T>(key:string, value:T): Promise<void> {
-    return (await this.storage_.set(this.getFullKey(key), value));
+    return this.storage_.set(this.getFullKey(key), value)
+  }
+
+  public async has(key:string):Promise<boolean> {
+    return this.storage_.has(this.getFullKey(key))
   }
 
   public async remove(key:string):Promise<void> {
-    return (await this.storage_.remove(this.getFullKey(key)));
+    return this.storage_.remove(this.getFullKey(key))
   }
 
   private getFullKey(key:string):string{
