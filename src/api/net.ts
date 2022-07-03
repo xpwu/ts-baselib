@@ -4,13 +4,31 @@ import {StreamBuilderCreator} from "./http/stream"
 import {Token} from "../db/token"
 
 
-/**
- * 401 表示net层不通，连通net层的方法常常是 login
- */
+
+export class NetFactory {
+  static readonly default = new NetFactory()
+
+  private nets:Map<string, Net> = new Map<string, Net>()
+
+  get(name:string, token: Token): Net{
+    let old = this.nets.get(name)
+    if (old === undefined) {
+      old = new Net(name, token)
+      this.nets.set(name, old)
+    }
+
+    return old
+  }
+}
+
 
 export class Net {
   public constructor(public readonly name:string, private readonly token: Token) {
   }
+
+  /**
+   * 401 表示net层不通，连通net层的方法常常是 login
+   */
 
   // 连续的多次401，只处理一次
   process401():void {
