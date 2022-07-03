@@ -32,5 +32,9 @@ export class Token extends Table<TokenItem>{
   async setValue(name: string, v:string) {
     this.updateOrInsert(name, new TokenItem(name, v))
   }
+
+  async clear(name:string) {
+    this.delete(name)
+  }
 }
 
