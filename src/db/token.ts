@@ -1,9 +1,9 @@
-import {Item, Table} from "./table"
+import {Item, Table, TableFactory} from "./table"
 import {selfDB} from "./db"
 import {sessionBlStorage} from "./storage"
 
 
-export class Token implements Item{
+class TokenItem implements Item{
   id: string
   token: string
 
@@ -13,7 +13,24 @@ export class Token implements Item{
   }
 }
 
-export function TokenTable(uid:string): Table<Token> {
-  return Table.New("token", Token, selfDB(uid, sessionBlStorage()))
+export function TokenTable(uid:string, tf: TableFactory = TableFactory.default): Token {
+  return tf.get("token", TokenItem, selfDB(uid, sessionBlStorage()), Token)
+}
+
+export class Token extends Table<TokenItem>{
+  static readonly Empty = ""
+
+  async value(name: string): Promise<string> {
+    let v = await this.get(name)
+    if (v === undefined) {
+      return Token.Empty
+    }
+
+    return v.token
+  }
+
+  async setValue(name: string, v:string) {
+    this.updateOrInsert(name, new TokenItem(name, v))
+  }
 }
 

@@ -45,31 +45,52 @@ class Meta0 {
   }
 }
 
+export class TableFactory {
+  static readonly default = new TableFactory()
+
+  private tables = new Map<string, Table<Item>>()
+
+  public get<E extends Item, T extends Table<E>>(
+    name:string, itemConstructor: {new (...args:any[]):E}
+    , db: DB, clazz: TableConstructor<E, T> = (Table as unknown as TableConstructor<E, T>)): T {
+
+    // todo: 直接赋值会一直报错，暂时使用这种方式
+    // (Table as unknown as TableConstructor<E, T>)
+
+    let old = this.tables.get(name)
+    if (old !== undefined) {
+      const err = old.checkItemCon(itemConstructor)
+      if (err !== null) {
+        throw err
+      }
+      return old as T
+    }
+
+    let n = new clazz(name, itemConstructor, db) as Table<Item>
+    this.tables.set(name, n)
+    return n as T
+  }
+}
+
 const MAX_PER_ARR = 100
+
+interface TableConstructor<E extends Item, T extends Table<E>> {
+  new (name:string, itemConstructor: {new (...args:any[]):E}, db: DB):T
+}
 
 export class Table<T extends Item> {
   private locker = new AsyncLocker()
 
-  private static tables = new Map<string, Table<Item>>()
-
-  public static New<T extends Item>(name:string, itemConstructor: {new (...args:any[]):T}
-    , db: DB): Table<T> {
-
-    let old = Table.tables.get(name)
-    if (old !== undefined) {
-      if (old.itemConstructor !== itemConstructor) {
-        throw new Error(`table<${name}> has different item`)
-      }
-      return old as Table<T>
-    }
-
-    let n = new Table(name, itemConstructor, db) as Table<any>
-    Table.tables.set(name, n)
-    return n
+  constructor(private readonly name:string, private itemConstructor: {new (...args:any[]):T}
+    , private readonly db: DB) {
   }
 
-  private constructor(private readonly name:string, private itemConstructor: {new ():T}
-    , private readonly db: DB) {
+  public checkItemCon(itemConstructor: {new (...args:any[]):T}):Error|null {
+    if (this.itemConstructor !== itemConstructor) {
+      return Error(`table<${this.name}> has different item`)
+    }
+
+    return null
   }
 
   // return: start
@@ -151,15 +172,14 @@ export class Table<T extends Item> {
   async updateOrInsert(id:string, data: Partial<T>) {
     let idKey = Table.idKey(id)
     await this.locker.lock(idKey)
-    let old1 = (await this.db.get(this.getName(idKey), Data<T>))
-    let old = allProNonNull(old1)
+    let old = allProNonNull((await this.db.get(this.getName(idKey), Data<T>)))
     let num = old?.no
     if (num === undefined) {
       num = await this.metaNum()
       await this.saveMeta(id, num)
     }
 
-    let nItem = {...old?.d, ...data, ...{id: id}}
+    let nItem = {...old?.d as T, ...data, ...{id: id}}
     await this.db.set(this.getName(idKey), new Data(num, nItem))
     this.locker.unlock(idKey)
   }
