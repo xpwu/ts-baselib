@@ -17,7 +17,7 @@ export function setStreamClientConstructor(con: StreamClientConstructor) {
   Client = con
 }
 
-export class Stream implements Http{
+class Stream implements Http{
   async send(): Promise<[string, (Error | null)]> {
     let client = Stream.allClients.get(this.builder.baseUrl())
     if (!client) {

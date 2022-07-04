@@ -1,5 +1,5 @@
 import {DB} from "./db"
-import {AsyncLocker} from "./asynclocker"
+import {AsyncLocker} from "../asynclocker"
 
 export interface Item {
   id: string

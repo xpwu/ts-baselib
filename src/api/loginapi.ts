@@ -10,7 +10,7 @@ class LogRes {
   data:RawJson = new RawJson()
 }
 
-export interface LoginRequest {
+interface LoginRequest {
   uri: string
   content: object
   headers?: Map<string, string>

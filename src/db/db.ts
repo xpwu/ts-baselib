@@ -32,11 +32,3 @@ export class DB {
   private readonly name_:string;
 }
 
-// export function shareDB(storage: BlStorage, prefix: string = ""):DB {
-//   return new DB(prefix + "share", storage)
-// }
-//
-// export function selfDB(uid: string, storage: BlStorage, prefix: string = ""): DB {
-//   return new DB(prefix + uid, storage)
-// }
-

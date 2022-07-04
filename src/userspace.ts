@@ -99,7 +99,9 @@ export class AloneUserSpace implements ReUserSpace{
     this.nf = new class {
       readonly nf = new NetFactory()
       get(name: string = "main"): Net {
-        return this.nf.get(name, TokenTable(us))
+        let ret = this.nf.get(name, TokenTable(us))
+        ret.setBaseUrl(baseUrl)
+        return ret
       }
     }
   }

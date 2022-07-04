@@ -52,7 +52,7 @@ export class Net {
     this.has401_ = false
   }
 
-  public setBaseUrls(urls: string) {
+  public setBaseUrl(urls: string) {
     this.baseUrl_ = urls
   }
 
