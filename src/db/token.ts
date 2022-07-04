@@ -1,6 +1,5 @@
-import {Item, Table, TableFactory} from "./table"
-import {selfDB} from "./db"
-import {sessionBlStorage} from "./storage"
+import {Item, Table} from "./table"
+import {UserSpace} from "../userspace"
 
 
 class TokenItem implements Item{
@@ -13,8 +12,8 @@ class TokenItem implements Item{
   }
 }
 
-export function TokenTable(uid:string, tf: TableFactory = TableFactory.default): Token {
-  return tf.get("token", TokenItem, selfDB(uid, sessionBlStorage()), Token)
+export function TokenTable(us: UserSpace): Token {
+  return us.tf.get("token", TokenItem, us.selfDB, Token)
 }
 
 export class Token extends Table<TokenItem>{
