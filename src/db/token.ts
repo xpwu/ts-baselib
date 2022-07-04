@@ -13,7 +13,7 @@ class TokenItem implements Item{
 }
 
 export function TokenTable(us: UserSpace): Token {
-  return us.tf.get("token", TokenItem, us.selfDB, Token)
+  return us.selfDB.table("token", TokenItem, Token)
 }
 
 export class Token extends Table<TokenItem>{

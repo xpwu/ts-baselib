@@ -52,12 +52,12 @@ export class Net {
     this.has401_ = false
   }
 
-  public setBaseUrls(urls: string[]) {
+  public setBaseUrls(urls: string) {
     this.baseUrl_ = urls
   }
 
   public getBaseUrl(): string {
-    return this.baseUrl_.length === 0? "Error: no base url" : this.baseUrl_[0]
+    return this.baseUrl_
   }
 
   // 每次获取builder时，在net层都应该调用生成函数生成一个builder 而不能在net层直接缓存一个builder直接返回
@@ -94,7 +94,7 @@ export class Net {
   private token_: string = Token.Empty
   private has401_: boolean = false
   private creator_: (baseUrl: string) => HttpBuilder = StreamBuilderCreator()
-  private baseUrl_: string[] = []
+  private baseUrl_: string = ""
   private net401Delegate_: ((net: Net) => void) = ((net: Net) => {
   })
 }

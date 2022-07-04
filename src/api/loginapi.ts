@@ -17,7 +17,7 @@ export interface LoginRequest {
 }
 
 export async function PostJsonLoginWithRes<T extends object>(req: LoginRequest, resType:{new(...args:any[]):T}
-    , oldUs: UserSpace, netName: string): Promise<[UserSpace, ProNullable<T>, CodeError|null]>{
+    , oldUs: UserSpace, netName?: string): Promise<[UserSpace, ProNullable<T>, CodeError|null]>{
 
   let net = oldUs.nf.get(netName)
 

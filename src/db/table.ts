@@ -46,13 +46,15 @@ class Meta0 {
 }
 
 export class TableFactory {
-  static readonly default = new TableFactory()
 
   private tables = new Map<string, Table<Item>>()
 
+  constructor(private readonly db: DB) {
+  }
+
   public get<E extends Item, T extends Table<E>>(
     name:string, itemConstructor: {new (...args:any[]):E}
-    , db: DB, clazz: TableConstructor<E, T> = (Table as unknown as TableConstructor<E, T>)): T {
+    ,clazz: TableConstructor<E, T> = (Table as unknown as TableConstructor<E, T>)): T {
 
     // todo: 直接赋值会一直报错，暂时使用这种方式
     // (Table as unknown as TableConstructor<E, T>)
@@ -66,7 +68,7 @@ export class TableFactory {
       return old as T
     }
 
-    let n = new clazz(name, itemConstructor, db) as Table<Item>
+    let n = new clazz(name, itemConstructor, this.db) as Table<Item>
     this.tables.set(name, n)
     return n as T
   }
@@ -74,7 +76,7 @@ export class TableFactory {
 
 const MAX_PER_ARR = 100
 
-interface TableConstructor<E extends Item, T extends Table<E>> {
+export interface TableConstructor<E extends Item, T extends Table<E>> {
   new (name:string, itemConstructor: {new (...args:any[]):E}, db: DB):T
 }
 
