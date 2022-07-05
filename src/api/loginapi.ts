@@ -52,7 +52,7 @@ export async function PostJsonLoginWithRes<T extends object>(req: LoginRequest, 
 class Response {}
 
 export async function PostJsonLogin(req: LoginRequest, oldUs: UserSpace
-                                    , netName: string): Promise<[UserSpace, CodeError|null]> {
+                                    , netName?: string): Promise<[UserSpace, CodeError|null]> {
   let [us, _, err] = await PostJsonLoginWithRes(req, Response, oldUs, netName)
   return [us, err]
 }
