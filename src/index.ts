@@ -1,6 +1,6 @@
 
 
-export {DBInterface, UserSpace, ReUserSpace, DB, AloneUserSpace} from "./userspace"
+export {DBInterface, UserSpace, ReUserSpace, DB, AloneUserSpaceSync, AloneUserSpace} from "./userspace"
 
 export {AsyncLocker} from "./asynclocker"
 
