@@ -78,8 +78,7 @@ export class AloneUserSpaceSync implements ReUserSpace{
     }
 
     let ret = new AloneUserSpaceSync(this.blStorage, this.baseUrl)
-    ret.uid = uid
-    ret.selfDB = new DB(`u_${uid}`, this.blStorage)
+    ret.init(uid)
     return ret
   }
 
@@ -109,8 +108,15 @@ export class AloneUserSpaceSync implements ReUserSpace{
 export class AloneUserSpace extends AloneUserSpaceSync{
 
   async clone(uid: string, becauseOfNet?: string): Promise<UserSpace> {
+
+    if (uid === this.getUid()) {
+      return this
+    }
+
     await this.shareDB.table("me", Me, Table).updateOrInsert("me", {uid: uid})
-    return super.clone(uid, becauseOfNet)
+    let ret = new AloneUserSpace(this.blStorage, this.baseUrl)
+    await ret.init()
+    return ret
   }
 
   async init() {
