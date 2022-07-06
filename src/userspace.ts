@@ -17,7 +17,7 @@ export interface UserSpace {
   readonly nc: NC
   readonly nf: { get(name?: string): Net }
 
-  clone(uid: string, becauseOfNet?: string): UserSpace
+  clone(uid: string, becauseOfNet?: string): Promise<UserSpace>
 }
 
 export type ReUserSpace = {- readonly [P in keyof UserSpace]: UserSpace[P]}
@@ -68,7 +68,11 @@ export class AloneUserSpace implements ReUserSpace{
 
   private uid: string = ""
 
-  clone(uid: string, becauseOfNet?: string): UserSpace {
+  public getUid():string {
+    return this.uid
+  }
+
+  async clone(uid: string, becauseOfNet?: string): Promise<UserSpace> {
     if (uid === this.uid) {
       return this
     }
@@ -76,6 +80,7 @@ export class AloneUserSpace implements ReUserSpace{
     let ret = new AloneUserSpace(this.blStorage, this.baseUrl)
     ret.uid = uid
     ret.selfDB = new DB(`u_${uid}`, this.blStorage)
+    await this.shareDB.table("me", Me).updateOrInsert("me", {uid: uid})
     return ret
   }
 

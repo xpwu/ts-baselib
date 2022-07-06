@@ -33,7 +33,7 @@ export async function PostJsonLoginWithRes<T extends object>(req: LoginRequest, 
     return [oldUs, ret, new CodeError("token is null")];
   }
 
-  let newUs = oldUs.clone(res.uid, netName)
+  let newUs = await oldUs.clone(res.uid, netName)
   net = newUs.nf.get(netName)
   await net.setToken(res.token);
 
