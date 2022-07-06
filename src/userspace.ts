@@ -30,7 +30,7 @@ export class DB implements DBInterface{
   }
 
   table<E extends Item, T extends Table<E>>(name: string
-    , itemConstructor: { new(...args: any[]): E }, clazz?: TableConstructor<E, T>): T {
+    , itemConstructor: { new(...args: any[]): E }, clazz: TableConstructor<E, T>): T {
 
     return this.tf.get(name, itemConstructor, clazz)
   }
@@ -61,7 +61,7 @@ class Me implements Item{
 
 export class AloneUserSpace implements ReUserSpace{
   nc: NC
-  nf: { get(name: string): Net }
+  nf: { get(name?: string): Net }
   shareDB: DB
 
   selfDB: DB
@@ -80,12 +80,12 @@ export class AloneUserSpace implements ReUserSpace{
     let ret = new AloneUserSpace(this.blStorage, this.baseUrl)
     ret.uid = uid
     ret.selfDB = new DB(`u_${uid}`, this.blStorage)
-    await this.shareDB.table("me", Me).updateOrInsert("me", {uid: uid})
+    await this.shareDB.table("me", Me, Table).updateOrInsert("me", {uid: uid})
     return ret
   }
 
   async init() {
-    const uid = (await this.shareDB.table("me", Me).get("me"))?.uid
+    const uid = (await this.shareDB.table("me", Me, Table).get("me"))?.uid
     if (uid === undefined || uid === "") {
       return
     }

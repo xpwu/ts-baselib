@@ -54,10 +54,9 @@ export class TableFactory {
 
   public get<E extends Item, T extends Table<E>>(
     name:string, itemConstructor: {new (...args:any[]):E}
-    ,clazz: TableConstructor<E, T> = (Table as unknown as TableConstructor<E, T>)): T {
+    ,clazz: TableConstructor<E, T>): T {
 
-    // todo: 直接赋值会一直报错，暂时使用这种方式
-    // (Table as unknown as TableConstructor<E, T>)
+    // todo:  clazz (default) = Table
 
     let old = this.tables.get(name)
     if (old !== undefined) {
@@ -169,6 +168,13 @@ export class Table<T extends Item> {
     await this.locker.lock(key)
     await this.db.remove(this.getName(key))
     this.locker.unlock(key)
+  }
+
+  async delAll() {
+    let ids = await this.getIds()
+    for (let id of ids) {
+      await this.delete(id)
+    }
   }
 
   async updateOrInsert(id:string, data: Partial<T>) {

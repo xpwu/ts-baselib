@@ -16,7 +16,8 @@
     "allowJs": false,
     "noImplicitAny": true,
     "esModuleInterop": true,
-    "strictNullChecks": true
+    "strictNullChecks": true,
+    "noFallthroughCasesInSwitch": true
   },
   "include": [
     "src",
