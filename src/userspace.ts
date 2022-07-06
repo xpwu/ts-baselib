@@ -59,7 +59,7 @@ class Me implements Item{
   uid:string = ""
 }
 
-export class AloneUserSpace implements ReUserSpace{
+export class AloneUserSpaceSync implements ReUserSpace{
   nc: NC
   nf: { get(name?: string): Net }
   shareDB: DB
@@ -77,19 +77,13 @@ export class AloneUserSpace implements ReUserSpace{
       return this
     }
 
-    let ret = new AloneUserSpace(this.blStorage, this.baseUrl)
+    let ret = new AloneUserSpaceSync(this.blStorage, this.baseUrl)
     ret.uid = uid
     ret.selfDB = new DB(`u_${uid}`, this.blStorage)
-    await this.shareDB.table("me", Me, Table).updateOrInsert("me", {uid: uid})
     return ret
   }
 
-  async init() {
-    const uid = (await this.shareDB.table("me", Me, Table).get("me"))?.uid
-    if (uid === undefined || uid === "") {
-      return
-    }
-
+  init(uid:string) {
     this.uid = uid
     this.selfDB = new DB(`u_${uid}`, this.blStorage)
   }
@@ -109,5 +103,22 @@ export class AloneUserSpace implements ReUserSpace{
         return ret
       }
     }
+  }
+}
+
+export class AloneUserSpace extends AloneUserSpaceSync{
+
+  async clone(uid: string, becauseOfNet?: string): Promise<UserSpace> {
+    await this.shareDB.table("me", Me, Table).updateOrInsert("me", {uid: uid})
+    return super.clone(uid, becauseOfNet)
+  }
+
+  async init() {
+    const uid = (await this.shareDB.table("me", Me, Table).get("me"))?.uid
+    if (uid === undefined || uid === "") {
+      return
+    }
+
+    super.init(uid)
   }
 }
