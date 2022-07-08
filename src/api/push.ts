@@ -1,4 +1,4 @@
-import { Json, JsonObject, ProNullable, RawJson } from "ts-json";
+import { Json, JsonObject, RawJson } from "ts-json";
 
 class Command {
   cmd: string = ""
@@ -15,7 +15,7 @@ interface Net {
 let allPushHandlers = new Map<NetName, Map<Cmd, (data: RawJson)=>void>>()
 
 export function RegisterStreamPush<T>(net: Net, cmd: Cmd
-        , handler: (data: ProNullable<T>)=>void, clazz:{new (...args:any[]):T}) {
+        , handler: (data: T)=>void, clazz:{new (...args:any[]):T}) {
 
   console.info(`RegisterStreamPush ${cmd}` + " for " + net.name)
   let cmds = allPushHandlers.get(net.name)
@@ -41,10 +41,6 @@ export function UnRegisterStreamPush(net: Net, cmd: Cmd) {
   }
 
   cmds.delete(cmd)
-}
-
-function AsNonNull<T>(arg: T): NonNullable<T> {
-  return arg as NonNullable<T>
 }
 
 export function handlerOfPush(net:Net): (data: string)=>void{

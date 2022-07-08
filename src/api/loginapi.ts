@@ -1,5 +1,4 @@
-import { ProNullable } from "ts-json";
-import { RawJson, JsonObject, Json } from "ts-json";
+import { RawJson, JsonObject, Json, JsonHas } from "ts-json";
 import {CodeError, PostJsonNoToken} from "./api";
 import {Token} from "../db/token"
 import {UserSpace} from "../userspace"
@@ -17,7 +16,7 @@ interface LoginRequest {
 }
 
 export async function PostJsonLoginWithRes<T extends object>(req: LoginRequest, resType:{new(...args:any[]):T}
-    , oldUs: UserSpace, netName?: string): Promise<[UserSpace, ProNullable<T>, CodeError|null]>{
+    , oldUs: UserSpace, netName?: string): Promise<[UserSpace, T, CodeError|null]>{
 
   let net = oldUs.nf.get(netName)
 
@@ -29,7 +28,10 @@ export async function PostJsonLoginWithRes<T extends object>(req: LoginRequest, 
   if (err) {
     return [oldUs, ret, err];
   }
-  if (res.token === null || res.token === Token.Empty || res.uid === null || res.uid === "") {
+
+  const has = JsonHas(res)
+
+  if (!has.token || res.token === Token.Empty || !res.uid || res.uid === "") {
     return [oldUs, ret, new CodeError("token is null")];
   }
 

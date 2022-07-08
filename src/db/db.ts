@@ -1,9 +1,8 @@
 import {BlStorage} from "./storage"
-import {ProNullable} from "ts-json"
 
 
 export class DB {
-  public async get<T>(key:string, con:{new (...args:any[]):T}):Promise<ProNullable<T>|undefined> {
+  public async get<T>(key:string, con:{new (...args:any[]):T}):Promise<T|undefined> {
     return this.storage_.get(this.getFullKey(key), con)
   }
 

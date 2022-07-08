@@ -95,6 +95,6 @@ export class Net {
   private has401_: boolean = false
   private creator_: (baseUrl: string) => HttpBuilder = StreamBuilderCreator()
   private baseUrl_: string = ""
-  private net401Delegate_: ((net: Net) => void) = ((net: Net) => {
+  private net401Delegate_: ((net: Net) => void) = ((_net: Net) => {
   })
 }

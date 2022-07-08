@@ -5,17 +5,6 @@ export interface Item {
   id: string
 }
 
-type OnlyNonNullable<T> = T extends null ? never : T
-
-type ProNonNull<T, Non extends keyof T> = {[P in keyof T]: P extends Non? OnlyNonNullable<T[P]> : T[P]}
-
-type IdNonNull<T extends Item> = ProNonNull<T, "id">
-
-type AllProNonNull<T> = T extends undefined? undefined :ProNonNull<T, keyof T>
-
-function allProNonNull<T>(arg: T): AllProNonNull<T> {
-  return arg as AllProNonNull<T>
-}
 
 class Num {
   constructor(public no:number) {
@@ -102,7 +91,7 @@ export class Table<T extends Item> {
 
     const key0 = Table.metaKey(0)
     await this.locker.lock(key0)
-    let meta0 = allProNonNull(await this.db.get(this.getName(key0), Meta0)) || new Meta0(0)
+    let meta0 = await this.db.get(this.getName(key0), Meta0) || new Meta0(0)
     let start = meta0.maxNo + 1
     meta0.maxNo += step
     await this.db.set(this.getName(key0), meta0)
@@ -114,14 +103,14 @@ export class Table<T extends Item> {
     const no = Math.ceil(num/MAX_PER_ARR)
     const key = Table.metaKey(no)
     await this.locker.lock(key)
-    let old = allProNonNull(await this.db.get(this.getName(key), IDs))  || new IDs([])
+    let old = await this.db.get(this.getName(key), IDs) || new IDs([])
     old.ids.push(id)
     await this.db.set(this.getName(key), old)
     await this.locker.unlock(key)
   }
 
   async get(id:string): Promise<T|undefined> {
-    let old = allProNonNull(await this.db.get(this.getName(Table.idKey(id)), Data<T>))
+    let old = await this.db.get(this.getName(Table.idKey(id)), Data<T>)
     if (old === undefined) {
       return undefined
     }
@@ -132,11 +121,11 @@ export class Table<T extends Item> {
   async getIds(): Promise<string[]> {
     const key0 = Table.metaKey(0)
     let ret:string[] = []
-    let meta0 = allProNonNull(await this.db.get(this.getName(key0), Meta0)) || new Meta0(0)
+    let meta0 = await this.db.get(this.getName(key0), Meta0) || new Meta0(0)
     for (let i = 0; i < meta0.maxNo; ++i) {
       let no = Math.ceil(i/MAX_PER_ARR)
       let key = Table.metaKey(no)
-      let old = allProNonNull(await this.db.get(this.getName(key), IDs)) || new IDs([])
+      let old = await this.db.get(this.getName(key), IDs) || new IDs([])
       ret = ret.concat(old.ids as string[])
     }
 
@@ -180,7 +169,7 @@ export class Table<T extends Item> {
   async updateOrInsert(id:string, data: Partial<T>) {
     let idKey = Table.idKey(id)
     await this.locker.lock(idKey)
-    let old = allProNonNull((await this.db.get(this.getName(idKey), Data<T>)))
+    let old = await this.db.get(this.getName(idKey), Data<T>)
     let num = old?.no
     if (num === undefined) {
       num = await this.metaNum()

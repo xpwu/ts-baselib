@@ -1,9 +1,8 @@
-import { ProNullable } from "ts-json";
 
 
 export interface BlStorage {
   set<T>(key:string, value:T):Promise<void>
-  get<T>(key:string, con:{new (...args:any[]):T}):Promise<ProNullable<T>|undefined>
+  get<T>(key:string, con:{new (...args:any[]):T}):Promise<T|undefined>
   has(key:string): Promise<boolean>
   remove(key:string): Promise<void>
 }
@@ -11,7 +10,7 @@ export interface BlStorage {
 export class MemoryStorage implements BlStorage{
   private readonly storage = new Map<string, any>()
 
-  async get<T>(key:string, con:{new (...args:any[]):T}):Promise<ProNullable<T>|undefined> {
+  async get<T>(key:string, _con:{new (...args:any[]):T}):Promise<T|undefined> {
     return this.storage.get(key);
   }
 

@@ -3,7 +3,6 @@ import {DB as DBInner} from "./db/db"
 import { NC } from "ts-nc"
 import {Net, NetFactory} from "./api/net"
 import {BlStorage} from "./db/storage"
-import { ProNullable } from "ts-json"
 import {TokenTable} from "./db/token"
 
 export interface DBInterface {
@@ -38,18 +37,18 @@ export class DB implements DBInterface{
 }
 
 class dummyStorage implements BlStorage{
-  async get<T>(key: string, con: { new(...args: any[]): T }): Promise<ProNullable<T> | undefined> {
+  async get<T>(_key: string, _con: { new(...args: any[]): T }): Promise<T | undefined> {
     return undefined;
   }
 
-  async has(key: string): Promise<boolean> {
+  async has(_key: string): Promise<boolean> {
     return false;
   }
 
-  async remove(key: string): Promise<void> {
+  async remove(_key: string): Promise<void> {
   }
 
-  async set<T>(key: string, value: T): Promise<void> {
+  async set<T>(_key: string, _value: T): Promise<void> {
   }
 
 }
@@ -72,7 +71,7 @@ export class AloneUserSpaceSync implements ReUserSpace{
     return this.uid
   }
 
-  async clone(uid: string, becauseOfNet?: string): Promise<UserSpace> {
+  async clone(uid: string, _becauseOfNet?: string): Promise<UserSpace> {
     if (uid === this.uid) {
       return this
     }
@@ -107,7 +106,7 @@ export class AloneUserSpaceSync implements ReUserSpace{
 
 export class AloneUserSpace extends AloneUserSpaceSync{
 
-  async clone(uid: string, becauseOfNet?: string): Promise<UserSpace> {
+  async clone(uid: string, _becauseOfNet?: string): Promise<UserSpace> {
 
     if (uid === this.getUid()) {
       return this

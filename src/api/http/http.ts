@@ -15,7 +15,7 @@ export abstract class HttpBuilder {
   protected uri_ = "";
   protected headers_: Map<string, string> = new Map();
   protected content_:string = "";
-  protected pusher_: (data:string)=>void = d=>{}
+  protected pusher_: (data:string)=>void = _d=>{}
 
   public setContent(content:string): this {
     this.content_ = content;

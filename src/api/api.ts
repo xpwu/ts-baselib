@@ -1,7 +1,7 @@
 import {Net} from "./net";
 import {Token} from "../db/token"
 import {Md5} from "ts-md5"
-import { Json, ProNullable, RawJson } from "ts-json";
+import {Json, JsonHas } from "ts-json";
 
 export enum Code {
   TokenExpireCode = 401,
@@ -23,8 +23,6 @@ export class CodeError extends Error{
 }
 
 const ReqId = "X-Req-Id"
-// const TokenStr = "token"
-// const CodeStr = "code"
 
 class Request {
   constructor(public token:string, public data:object) {
@@ -47,7 +45,7 @@ class Response<T> {
 */
 export async function PostJson<T extends object>(uri:string, request: object
   , resType:{new(...args:any[]):T}, net:Net, headers:Map<string, string> = new Map<string, string>())
-  :Promise<[ProNullable<T>, CodeError|null]> {
+  :Promise<[T, CodeError|null]> {
 
   if (net.is401()) {
     return [new resType(), new CodeError("has 401", Code.TokenExpireCode)]
@@ -61,21 +59,21 @@ export async function PostJson<T extends object>(uri:string, request: object
 
   const r = new Request(token, request)
 
-  // (<Record<string, any>>request)[TokenStr] = token
-
   let [ret, err] = await PostJsonNoToken(uri, r, new Response(0, new resType()), net, headers)
   if (err !== null) {
     return [new resType(), err]
   }
 
-  if (ret.code === null || ret.data === null) {
+  const has = JsonHas(ret)
+
+  if (!has.code || !has.data) {
     return [new resType(), new CodeError("response format is err!", Code.Unknown)]
   }
 
   if (ret.code !== Code.TokenExpireCode) {
     // 取消401
     net.clear401()
-    return [ret.data as ProNullable<T>, err]
+    return [ret.data, err]
   }
 
   // 返回401时，如果请求的token与现在存储token不是一样的，说明有登录接口修改过，最新
@@ -111,7 +109,7 @@ function SignNonceStr(len: number = 20): string {
 
 export async function PostJsonNoToken<T extends {[P in keyof T]:T[P]}>(uri:string, request: object
   , resType:{new(...args:any[]):T}|T, net:Net, headers:Map<string, string> = new Map<string, string>())
-  : Promise<[ProNullable<T>, CodeError|null]> {
+  : Promise<[T, CodeError|null]> {
 
   if (typeof resType === "function") {
     resType = new resType()
