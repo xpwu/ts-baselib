@@ -83,6 +83,10 @@ export class Table<T extends Item> {
     return null
   }
 
+  private newData():Data<T> {
+    return new Data<T>(0, new this.itemConstructor())
+  }
+
   // return: start
   private async metaNum(step: number = 1):Promise<number> {
     if (step <= 0) {
@@ -110,7 +114,7 @@ export class Table<T extends Item> {
   }
 
   async get(id:string): Promise<T|undefined> {
-    let old = await this.db.get(this.getName(Table.idKey(id)), Data<T>)
+    let old = await this.db.get(this.getName(Table.idKey(id)), this.newData())
     if (old === undefined) {
       return undefined
     }
@@ -122,7 +126,7 @@ export class Table<T extends Item> {
     const key0 = Table.metaKey(0)
     let ret:string[] = []
     let meta0 = await this.db.get(this.getName(key0), Meta0) || new Meta0(0)
-    for (let i = 0; i < meta0.maxNo; ++i) {
+    for (let i = 1; i < meta0.maxNo; i = i+MAX_PER_ARR) {
       let no = Math.ceil(i/MAX_PER_ARR)
       let key = Table.metaKey(no)
       let old = await this.db.get(this.getName(key), IDs) || new IDs([])
@@ -160,16 +164,34 @@ export class Table<T extends Item> {
   }
 
   async delAll() {
+    const key0 = Table.metaKey(0)
+    await this.locker.lock(key0)
+    let meta0 = await this.db.get(this.getName(key0), Meta0)
+    if (meta0 === undefined) {
+      this.locker.unlock(key0)
+      return
+    }
+
     let ids = await this.getIds()
     for (let id of ids) {
       await this.delete(id)
     }
+
+    for (let i = 1; i < meta0.maxNo; i = i+MAX_PER_ARR) {
+      let no = Math.ceil(i/MAX_PER_ARR)
+      let key = Table.metaKey(no)
+      await this.db.remove(this.getName(key))
+    }
+
+    await this.db.remove(this.getName(key0))
+
+    this.locker.unlock(key0)
   }
 
   async updateOrInsert(id:string, data: Partial<T>) {
     let idKey = Table.idKey(id)
     await this.locker.lock(idKey)
-    let old = await this.db.get(this.getName(idKey), Data<T>)
+    let old = await this.db.get(this.getName(idKey), this.newData())
     let num = old?.no
     if (num === undefined) {
       num = await this.metaNum()
