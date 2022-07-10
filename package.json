@@ -3,8 +3,6 @@
   "version": "0.0.1",
   "description": "typescript base lib",
   "author": "xpwu",
-  "main": "src/index",
-  "types": "src/index",
   "dependencies": {
     "ts-nc": "https://github.com/xpwu/ts-nc.git",
     "ts-json": "https://github.com/xpwu/ts-json.git",
@@ -28,7 +26,8 @@
   ],
   "license": "MIT",
   "files": [
-    "src"
+    "src",
+    "index.ts"
   ],
   "repository": {
     "type": "git",
