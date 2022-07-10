@@ -6,8 +6,7 @@ export interface StreamClientConstructor {
 }
 
 export interface StreamClient {
-  send(content:string, uri:{key:string, value:string}
-    , headers?:Map<string, string>):Promise<[string, (Error | null)]>
+  send(content:string, uri:string, headers?:Map<string, string>):Promise<[string, (Error | null)]>
   setPusher(push:(data:string)=>void):void
 }
 
@@ -26,20 +25,19 @@ class Stream implements Http{
       client.setPusher(this.builder.pusher)
     }
 
-    return client.send(this.builder.content(), {key:this.headerAPIKey, value:this.builder.uri()}
-      , this.builder.headers())
+    return client.send(this.builder.content(), this.builder.uri(), this.builder.headers())
   }
 
-  constructor(private builder: HttpBuilder, private headerAPIKey: string = "api") {}
+  constructor(private builder: HttpBuilder) {}
 
   private static allClients = new Map<string, StreamClient>()
 }
 
-export function StreamBuilderCreator(headerAPIKey:string = "api"): (baseUrl:string)=>HttpBuilder {
+export function StreamBuilderCreator(): (baseUrl:string)=>HttpBuilder {
   return baseUrl => {
     return new class extends HttpBuilder {
       build(): Http {
-        return new Stream(this, headerAPIKey)
+        return new Stream(this)
       }
     }(baseUrl)
   }
